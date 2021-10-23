@@ -1,21 +1,23 @@
-import React, {useState} from 'react';
+import React, {useState, useContext, createContext} from 'react';
 import {
   RecoilRoot,
   atom,
   selector,
   useRecoilState,
   useRecoilValue,
+  useSetRecoilState,
 } from 'recoil';
 import {
-  BrowserRouter as Router,
+  HashRouter,
   Switch,
   Route,
   Link
 } from "react-router-dom";
-import {LinkContainer} from 'react-router-bootstrap';
 import {
     Navbar,
     Container,
+    Row,
+    Col,
     Nav,
     Card,
     InputGroup,
@@ -26,17 +28,83 @@ import {
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
+const connectionStatusAtom = atom(
+    {
+        key: 'connectionStatus',
+        default: '',
+    });
+
+
+declare global {
+    interface Window {
+        Paho:any;
+    }
+}
+let mqttDefault = {
+    connect: (arg : string) => {}
+};
+const MQTTContext = createContext(mqttDefault);
+function MQTTWrapper(props: any)
+{
+    const setConnectionStatus = useSetRecoilState(connectionStatusAtom);
+
+    let onConnect = (context : any) => {
+        setConnectionStatus("Connected!");
+    }
+    let onFailure = (context : any) => {
+        setConnectionStatus("Failed");
+    }
+    let onMessageArrived = (pahoMessage : any) => {
+        console.log(pahoMessage.payloadString);
+    }
+
+    // TODO: Is there an on disconnect.
+    // TODO: Set connection status based on client.
+
+    let client = null;
+    let connect = (ipAddress: string) =>
+    {
+        client = new window.Paho.MQTT.Client(ipAddress, "website");
+        client.onMessageArrived = onMessageArrived;
+        client.connect({onSuccess:onConnect, onFailure:onFailure});
+    };
+
+
+    let contextData = {
+        connect: connect
+    };
+    return (
+        <MQTTContext.Provider value={contextData}>
+            {props.children}
+        </MQTTContext.Provider>
+    );
+}
+
 function Home() {
     return (
         <div>
             <AppNavBar/>
             <Container className="py-5">
-               <ConnectButton/>
+               <Row>
+                  <ConnectButton/>
+               </Row>
+               <Row className="py-3">
+                  <StatusIndicatorCard/>
+               </Row>
             </Container>
         </div>
     );
 }
 
+function StatusIndicatorCard(props: any) {
+    const connectionStatus = useRecoilValue(connectionStatusAtom);
+
+    return (
+        <Card>
+            <p> Connection Status: {connectionStatus} </p>
+        </Card>
+    );
+}
 
 function Pub() {
     return (
@@ -51,12 +119,13 @@ function Sub() {
 }
 
 function ConnectButton() {
-    const [inputText, setInputText] = useState('websocket ip');
+    const [inputText, setInputText] = useState('ws://localhost:8082/');
+    const mqtt = useContext(MQTTContext);
 
     let onSubmit = (e : any) =>
         {
             e.preventDefault();
-            console.log(inputText);
+            mqtt.connect(inputText);
         };
     let onChange = (e: any) =>
         {
@@ -76,11 +145,11 @@ function AppNavBar() {
     return (
         <Navbar bg="primary" variant="dark" expand="sm" className="py-0">
             <Container>
-                <Navbar.Brand href="/">J7S</Navbar.Brand>
-                <Nav className="me-auto">
-                   <LinkContainer to="/pub"><Nav.Link>Publish</Nav.Link></LinkContainer>
-                   <LinkContainer to="/sub"><Nav.Link>Subscribe</Nav.Link></LinkContainer>
-                </Nav>
+              <Navbar.Brand as={Link} to="/">J7S</Navbar.Brand>
+              <Nav className="me-auto">
+                 <Link to="/pub" className="nav-link">Publish</Link>
+                 <Link to="/sub" className="nav-link">Subscribe</Link>
+              </Nav>
             </Container>
         </Navbar>
     );
@@ -88,20 +157,22 @@ function AppNavBar() {
 
 function AppRoutes() {
     return (
-        <Router>
+        <HashRouter>
             <Switch>
                 <Route path="/pub"> <Pub/> </Route>
                 <Route path="/sub"> <Sub/> </Route>
                 <Route path="/"> <Home/> </Route>
             </Switch>
-        </Router>
+        </HashRouter>
     );
 }
 
 function App() {
   return (
       <RecoilRoot>
-          <AppRoutes/>
+          <MQTTWrapper>
+            <AppRoutes/>
+          </MQTTWrapper>
       </RecoilRoot>
   );
 }
