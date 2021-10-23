@@ -26,7 +26,7 @@ function Home() {
             <AppNavBar/>
             <Container fluid>
                 <Card>
-                   <
+                   <h1> Hi! </h1>
                 </Card>
             </Container>
         </div>
