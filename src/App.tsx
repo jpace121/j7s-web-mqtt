@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   RecoilRoot,
   atom,
@@ -13,10 +13,16 @@ import {
   Link
 } from "react-router-dom";
 import {LinkContainer} from 'react-router-bootstrap';
-import Navbar from 'react-bootstrap/Navbar';
-import Container from 'react-bootstrap/Container';
-import Nav from 'react-bootstrap/Nav';
-import Card from 'react-bootstrap/Card';
+import {
+    Navbar,
+    Container,
+    Nav,
+    Card,
+    InputGroup,
+    Button,
+    FormControl,
+    Form
+} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -24,14 +30,13 @@ function Home() {
     return (
         <div>
             <AppNavBar/>
-            <Container fluid>
-                <Card>
-                   <h1> Hi! </h1>
-                </Card>
+            <Container className="py-5">
+               <ConnectButton/>
             </Container>
         </div>
     );
 }
+
 
 function Pub() {
     return (
@@ -42,6 +47,28 @@ function Pub() {
 function Sub() {
     return (
         <AppNavBar/>
+    );
+}
+
+function ConnectButton() {
+    const [inputText, setInputText] = useState('websocket ip');
+
+    let onSubmit = (e : any) =>
+        {
+            e.preventDefault();
+            console.log(inputText);
+        };
+    let onChange = (e: any) =>
+        {
+            setInputText(e.target.value);
+        };
+    return(
+    <Form onSubmit={onSubmit}>
+        <InputGroup>
+            <FormControl placeholder={inputText} onChange={onChange}/>
+            <Button type="submit" variant="outline-secondary">Connect</Button>
+        </InputGroup>
+    </Form>
     );
 }
 
