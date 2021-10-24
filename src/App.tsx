@@ -101,7 +101,7 @@ function MQTTWrapper(props: any)
         if(pahoMessage.destinationName === "led_state")
         {
             const payload = JSON.parse(pahoMessage.payloadString);
-            if(payload.index == subscriptionIndex) {
+            if(payload.index === parseInt(subscriptionIndex)) {
                 setBrightness(payload.brightness);
                 setColor(payload.color);
             }
