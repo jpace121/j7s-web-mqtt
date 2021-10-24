@@ -35,6 +35,24 @@ const connectionStatusAtom = atom(
         default: '',
     });
 
+const subscribedColorAtom = atom(
+    {
+        key: 'subscribedColorAtom',
+        default: 'None'
+    });
+
+const subscribedBrightnessAtom = atom(
+    {
+        key: 'subscribedBrightnessAtom',
+        default: 'None'
+    });
+
+const subscriptionIndexAtom = atom(
+    {
+        key: 'subscriptionIndexAtom',
+        default: '0'
+    });
+
 
 declare global {
     interface Window {
@@ -49,6 +67,10 @@ const MQTTContext = createContext(mqttDefault);
 function MQTTWrapper(props: any)
 {
     const setConnectionStatus = useSetRecoilState(connectionStatusAtom);
+    const subscriptionIndex = useRecoilValue(subscriptionIndexAtom);
+    const setBrightness = useSetRecoilState(subscribedBrightnessAtom);
+    const setColor = useSetRecoilState(subscribedColorAtom);
+
     let client: any = null; // eeww.
 
     let setLed = (index: number, color: string, brightness: number) => {
@@ -67,6 +89,7 @@ function MQTTWrapper(props: any)
 
     let onConnected = (context : any) => {
         setConnectionStatus("Connected!");
+        client.subscribe("led_state")
     }
     let onConnectionLost = (context : any) => {
         setConnectionStatus("Disconnected");
@@ -75,7 +98,14 @@ function MQTTWrapper(props: any)
         setConnectionStatus("Failed");
     }
     let onMessageArrived = (pahoMessage : any) => {
-        console.log(pahoMessage.payloadString);
+        if(pahoMessage.destinationName === "led_state")
+        {
+            const payload = JSON.parse(pahoMessage.payloadString);
+            if(payload.index == subscriptionIndex) {
+                setBrightness(payload.brightness);
+                setColor(payload.color);
+            }
+        }
     }
 
     let connect = (ipAddress: string) =>
@@ -132,7 +162,41 @@ function Pub() {
 
 function Sub() {
     return (
-        <AppNavBar/>
+        <div>
+            <AppNavBar/>
+            <Container className="py-5">
+               <SubscriptionCard/>
+            </Container>
+        </div>
+    );
+}
+
+function SubscriptionCard() {
+    const brightnessState = useRecoilValue(subscribedBrightnessAtom);
+    const colorState = useRecoilValue(subscribedColorAtom);
+    const [subscriptionIndexState, setSubscriptionIndex] = useRecoilState(subscriptionIndexAtom);
+
+    let onIndexChange = (event: any) =>
+    {
+        setSubscriptionIndex(event.target.value);
+    };
+
+    return (
+        <Card className="padded-card">
+            <Row>
+                <Col>
+                  <IndexList value={subscriptionIndexState} onChange={onIndexChange}/>
+                </Col>
+                <Col>
+                  <Card>
+                   <Container className="card-body">
+                        <Row> <Col> <p> Brightness: {brightnessState} </p> </Col> </Row>
+                        <Row> <Col> <p> Color: {colorState} </p> </Col>  </Row>
+                   </Container>
+                  </Card>
+                </Col>
+            </Row>
+        </Card>
     );
 }
 
