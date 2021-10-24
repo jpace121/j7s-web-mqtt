@@ -105,10 +105,14 @@ function Home() {
             <AppNavBar/>
             <Container className="py-5">
                <Row>
-                  <ConnectButton/>
+                 <Col>
+                    <ConnectButton/>
+                 </Col>
                </Row>
                <Row className="py-3">
+                 <Col>
                   <StatusIndicatorCard/>
+                 </Col>
                </Row>
             </Container>
         </div>
@@ -136,9 +140,57 @@ function StatusIndicatorCard() {
     const connectionStatus = useRecoilValue(connectionStatusAtom);
 
     return (
-        <Card>
+        <Card className="padded-card">
             <p> Connection Status: {connectionStatus} </p>
         </Card>
+    );
+}
+
+function ColorList(props: any) {
+    return (
+        <FloatingLabel controlId="floatingSelect" label="Color">
+            <Form.Select value={props.value} onChange={props.onChange}>
+                <option value="off">off</option>
+                <option value="red">red</option>
+                <option value="lime">lime</option>
+                <option value="green">green</option>
+                <option value="blue">blue</option>
+                <option value="white">white</option>
+                <option value="aqua">aqua</option>
+            </Form.Select>
+        </FloatingLabel>
+    );
+}
+
+function IndexList(props: any) {
+    return (
+        <FloatingLabel controlId="floatingSelect" label="LED Index">
+            <Form.Select value={props.value} onChange={props.onChange}>
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+            </Form.Select>
+        </FloatingLabel>
+    );
+}
+
+function BrightnessSelect(props: any) {
+    return (
+        <FloatingLabel controlId="floatinglabel" label="Brightness">
+            <Form.Control
+                type="number"
+                max="1.0"
+                min="0.0"
+                step="0.1"
+                value={props.value}
+                onChange={props.onChange}
+            />
+        </FloatingLabel>
     );
 }
 
@@ -168,49 +220,19 @@ function PublishCard() {
             <Form onSubmit={onSubmit}>
                 <Row>
                     <Col>
-                        <FloatingLabel controlId="floatingSelect" label="LED Index">
-                            <Form.Select value={indexState} onChange={onIndexChange}>
-                               <option value="0">0</option>
-                               <option value="1">1</option>
-                               <option value="2">2</option>
-                               <option value="3">3</option>
-                               <option value="4">4</option>
-                               <option value="5">5</option>
-                               <option value="6">6</option>
-                               <option value="7">7</option>
-                            </Form.Select>
-                        </FloatingLabel>
+                        <IndexList value={indexState} onChange={onIndexChange}/>
                     </Col>
                     <Col>
-                        <FloatingLabel controlId="floatingSelect" label="Color">
-                            <Form.Select value={colorState} onChange={onColorChange}>
-                               <option value="off">off</option>
-                               <option value="red">red</option>
-                               <option value="lime">lime</option>
-                               <option value="green">green</option>
-                               <option value="blue">blue</option>
-                               <option value="white">white</option>
-                               <option value="aqua">aqua</option>
-                            </Form.Select>
-                        </FloatingLabel>
+                       <ColorList value={colorState} onChange={onColorChange}/>
                     </Col>
                     <Col>
-                       <FloatingLabel controlId="floatinglabel" label="Brightness">
-                           <Form.Control
-                                type="number"
-                                max="1.0"
-                                min="0.0"
-                                step="0.1"
-                                value={brightnessState}
-                                onChange={onBrightnessChange}
-                            />
-                       </FloatingLabel>
+                        <BrightnessSelect value={brightnessState} onChange={onBrightnessChange}/>
                     </Col>
                 </Row>
                 <Row className="py-3">
                    <Col className="col-4"/>
                    <Col className="col-4 d-grid">
-                    <Button type="submit">Set!</Button>
+                      <Button type="submit">Set!</Button>
                    </Col>
                    <Col className="col-4"/>
                 </Row>
