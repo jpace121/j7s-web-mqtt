@@ -43,7 +43,7 @@ declare global {
 }
 let mqttDefault = {
     connect: (arg : string) => {},
-    setLed: (index: number, color: string, brightness: number) => {}
+    setLed: (index: number, color: string, brightness: number): boolean => {return true;}
 };
 const MQTTContext = createContext(mqttDefault);
 function MQTTWrapper(props: any)
@@ -53,9 +53,7 @@ function MQTTWrapper(props: any)
 
     let setLed = (index: number, color: string, brightness: number) => {
         if(!client) {
-            // TODO: handle errors.
-            console.log("Client not connected.");
-            return;
+            return false;
         }
 
         let payload = {
@@ -63,9 +61,8 @@ function MQTTWrapper(props: any)
             color: color,
             brightness: brightness
         };
-        console.log("Publishing...");
-
         client.publish("led_state", JSON.stringify(payload));
+        return true;
     }
 
     let onConnected = (context : any) => {
@@ -159,7 +156,11 @@ function PublishCard() {
     let onSubmit = (e : any) =>
         {
             e.preventDefault();
-            mqtt.setLed(Number(indexState), colorState, Number(brightnessState));
+            let error = mqtt.setLed(Number(indexState), colorState, Number(brightnessState));
+            if(!error) {
+                // TODO: Handle better.
+                console.log("Failed to publish!");
+            }
         };
 
     return (

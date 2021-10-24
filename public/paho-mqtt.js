@@ -2169,8 +2169,7 @@ var PahoMQTT = (function (global) {
 		 * @throws {InvalidState} if the client is not connected.
 		 */
 		 this.publish = function(topic,payload,qos,retained) {
-			 console.log("Publising message to: ", topic);
-			 var message ;
+			var message ;
 
  			if(arguments.length === 0){
  				throw new Error("Invalid argument."+"length");
