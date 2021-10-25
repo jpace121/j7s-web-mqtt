@@ -29,10 +29,16 @@ import {
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
+enum ConnectionState {
+    False = 'Not Connected',
+    True = 'Connected!',
+    Errored = 'Connection Failed'
+};
+
 const connectionStatusAtom = atom(
     {
         key: 'connectionStatus',
-        default: '',
+        default: ConnectionState.False,
     });
 
 const subscribedColorAtom = atom(
@@ -88,14 +94,14 @@ function MQTTWrapper(props: any)
     }
 
     let onConnected = (context : any) => {
-        setConnectionStatus("Connected!");
+        setConnectionStatus(ConnectionState.True);
         client.subscribe("led_state")
     }
     let onConnectionLost = (context : any) => {
-        setConnectionStatus("Disconnected");
+        setConnectionStatus(ConnectionState.False);
     }
     let onFailure = (context : any) => {
-        setConnectionStatus("Failed");
+        setConnectionStatus(ConnectionState.Errored);
     }
     let onMessageArrived = (pahoMessage : any) => {
         if(pahoMessage.destinationName === "led_state")
@@ -205,7 +211,7 @@ function StatusIndicatorCard() {
 
     return (
         <Card className="padded-card">
-            <p> Connection Status: {connectionStatus} </p>
+            <p> Connection Status: {connectionStatus.toString()} </p>
         </Card>
     );
 }
@@ -329,6 +335,22 @@ function ConnectButton() {
     );
 }
 
+function ConnectedLight(props: any) {
+    const connectedState = useRecoilValue(connectionStatusAtom);
+
+    var connectColor = 'red';
+    if(connectedState === ConnectionState.True)
+    {
+        connectColor = 'green';
+    }
+
+    return (
+        <svg width="20" height="20" className={props.className}>
+            <circle cx="10" cy="10" r="10" stroke="black" strokeWidth="0" fill={connectColor} />
+        </svg>
+    );
+}
+
 function AppNavBar() {
     return (
         <Navbar bg="primary" variant="dark" expand="sm" className="py-0">
@@ -338,6 +360,10 @@ function AppNavBar() {
                  <Link to="/pub" className="nav-link">Publish</Link>
                  <Link to="/sub" className="nav-link">Subscribe</Link>
               </Nav>
+             <div className="meAuto">
+                <span className="navbar-text">Connection Status: </span>
+                <ConnectedLight className="meAuto"/>
+            </div>
             </Container>
         </Navbar>
     );
