@@ -356,14 +356,17 @@ function AppNavBar() {
         <Navbar bg="primary" variant="dark" expand="sm" className="py-0">
             <Container>
               <Navbar.Brand as={Link} to="/">J7S</Navbar.Brand>
-              <Nav className="me-auto">
-                 <Link to="/pub" className="nav-link">Publish</Link>
-                 <Link to="/sub" className="nav-link">Subscribe</Link>
+              <Navbar.Toggle aria-controls="collapse-navbar-nav"/>
+              <Navbar.Collapse id="collapse-navbar-nav">
+              <Nav>
+                <Link to="/pub" className="nav-link">Publish</Link>
+                <Link to="/sub" className="nav-link">Subscribe</Link>
               </Nav>
-             <div className="meAuto">
-                <span className="navbar-text">Connection Status: </span>
-                <ConnectedLight className="meAuto"/>
-            </div>
+              </Navbar.Collapse>
+              <Navbar.Collapse className="justify-content-end">
+                <Navbar.Text> Connection Status: </Navbar.Text>
+                <ConnectedLight/>
+              </Navbar.Collapse>
             </Container>
         </Navbar>
     );
