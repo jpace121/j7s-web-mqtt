@@ -16,6 +16,7 @@ import React, {useState, useContext} from 'react';
 import {
   useRecoilValue,
 } from 'recoil';
+import { useAuth  } from "react-oidc-context";
 import {
     Container,
     Row,
@@ -69,11 +70,18 @@ function StatusIndicatorCard() {
 function ConnectButton() {
     const [inputText, setInputText] = useState('ws://localhost:8082/');
     const mqtt = useContext(MQTTContext);
+    const auth = useAuth();
 
     let onSubmit = (e : any) =>
         {
             e.preventDefault();
-            mqtt.connect(inputText);
+
+            if(!auth.isAuthenticated) {
+                auth.signinRedirect();
+            }
+
+            // The as thing is disgusting hack. Worse than using any.
+            mqtt.connect(inputText, auth.user?.profile.upn as string, auth.user?.access_token as string);
         };
     let onChange = (e: any) =>
         {
@@ -88,4 +96,3 @@ function ConnectButton() {
     </Form>
     );
 }
-

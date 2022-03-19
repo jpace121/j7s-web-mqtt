@@ -31,7 +31,7 @@ declare global {
     }
 }
 let mqttDefault = {
-    connect: (arg : string) => {},
+    connect: (url: string, username: string, password: string) => {},
     setLed: (index: number, color: string, brightness: number): boolean => {return true;}
 };
 
@@ -80,13 +80,13 @@ export function MQTTWrapper(props: any)
         }
     }
 
-    let connect = (ipAddress: string) =>
+    let connect = (ipAddress: string, username: string, password: string) =>
     {
         client = new window.Paho.MQTT.Client(ipAddress, "website");
         client.onMessageArrived = onMessageArrived;
         client.onConnectionLost = onConnectionLost;
         client.onConnected = onConnected;
-        client.connect({onFailure:onFailure});
+        client.connect({onFailure:onFailure, userName:username, password:password});
     };
 
 

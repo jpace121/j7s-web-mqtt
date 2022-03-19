@@ -20,6 +20,7 @@ import {
   Switch,
   Route
 } from "react-router-dom";
+import { AuthProvider }  from "react-oidc-context";
 import {
     MQTTWrapper
 } from './MQTTContext';
@@ -36,12 +37,20 @@ import {
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
+const oidcConfig = {
+    authority: "https://auth.jpace121.net/realms/jpace121-main",
+    client_id: "jpace-mqtt",
+    redirect_uri: "http://localhost:3000/"
+};
+
 function App() {
   return (
       <RecoilRoot>
-          <MQTTWrapper>
-            <AppRoutes/>
-          </MQTTWrapper>
+          <AuthProvider {...oidcConfig}>
+            <MQTTWrapper>
+                <AppRoutes/>
+            </MQTTWrapper>
+          </AuthProvider>
       </RecoilRoot>
   );
 }
