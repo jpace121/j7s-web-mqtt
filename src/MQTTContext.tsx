@@ -32,7 +32,8 @@ declare global {
 }
 let mqttDefault = {
     connect: (url: string, username: string, password: string) => {},
-    setLed: (index: number, color: string, brightness: number): boolean => {return true;}
+    setLed: (index: number, color: string, brightness: number): boolean => {return true;},
+    disconnect: () => {},
 };
 
 export const MQTTContext = createContext(mqttDefault);
@@ -89,10 +90,20 @@ export function MQTTWrapper(props: any)
         client.connect({onFailure:onFailure, userName:username, password:password});
     };
 
+    let disconnect = () =>
+    {
+        if(client) {
+            client.disconnect();
+            client = null;
+        }
+    };
+
+
 
     let contextData = {
         connect: connect,
-        setLed: setLed
+        setLed: setLed,
+        disconnect: disconnect
     };
     return (
         <MQTTContext.Provider value={contextData}>

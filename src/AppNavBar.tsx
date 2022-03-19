@@ -16,10 +16,17 @@ import {
   useRecoilValue,
 } from 'recoil';
 import {
+    useContext,
+} from 'react';
+import {
+    useAuth,
+} from "react-oidc-context";
+import {
   Link
 } from "react-router-dom";
 import {
     Navbar,
+    NavDropdown,
     Container,
     Nav,
 } from 'react-bootstrap';
@@ -27,10 +34,13 @@ import {
     ConnectionState,
     connectionStatusAtom,
 } from './Atoms'
+import {
+    MQTTContext
+} from './MQTTContext';
 
 export function AppNavBar() {
     return (
-        <Navbar bg="primary" variant="dark" expand="sm" className="py-0">
+        <Navbar bg="light" variant="light" expand="sm" className="py-0">
             <Container>
               <Navbar.Brand as={Link} to="/">J7S</Navbar.Brand>
               <Navbar.Toggle aria-controls="collapse-navbar-nav"/>
@@ -41,26 +51,49 @@ export function AppNavBar() {
               </Nav>
               </Navbar.Collapse>
               <Navbar.Collapse className="justify-content-end">
-                <Navbar.Text> Connection Status: </Navbar.Text>
-                <ConnectedLight/>
+                <Nav>
+                    <Connected/>
+                    <Login/>
+                </Nav>
               </Navbar.Collapse>
             </Container>
         </Navbar>
     );
 }
 
-function ConnectedLight(props: any) {
+function Connected(props: any) {
     const connectedState = useRecoilValue(connectionStatusAtom);
 
-    var connectColor = 'red';
     if(connectedState === ConnectionState.True)
     {
-        connectColor = 'green';
+        return (
+            <Nav.Item className="nav-link">Connected</Nav.Item>
+        );
+    }
+    return (
+        <Nav.Item className="nav-link" style={{ color: "red" }}>Disconnected</Nav.Item>
+    );
+
+}
+
+function Login(props: any) {
+    const auth = useAuth();
+    const mqtt = useContext(MQTTContext);
+    let onLogout = () => {
+        mqtt.disconnect();
+        auth.removeUser();
+    };
+
+
+    if(auth.isAuthenticated) {
+        return (
+            <NavDropdown title={ (auth.user?.profile.upn as string) }>
+                <NavDropdown.Item onClick={onLogout}>Logout</NavDropdown.Item>
+            </NavDropdown>
+        );
     }
 
     return (
-        <svg width="20" height="20" className={props.className}>
-            <circle cx="10" cy="10" r="10" stroke="black" strokeWidth="0" fill={connectColor} />
-        </svg>
+        <Nav.Item className="nav-link" onClick={() => void auth.signinPopup()}>Login</Nav.Item>
     );
 }

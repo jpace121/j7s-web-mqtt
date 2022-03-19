@@ -76,12 +76,11 @@ function ConnectButton() {
         {
             e.preventDefault();
 
-            if(!auth.isAuthenticated) {
-                auth.signinRedirect();
+            if(auth.isAuthenticated) {
+                // The as thing is disgusting hack. Worse than using any.
+                mqtt.connect(inputText, auth.user?.profile.upn as string, auth.user?.access_token as string);
             }
 
-            // The as thing is disgusting hack. Worse than using any.
-            mqtt.connect(inputText, auth.user?.profile.upn as string, auth.user?.access_token as string);
         };
     let onChange = (e: any) =>
         {
