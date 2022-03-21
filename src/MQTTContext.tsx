@@ -92,7 +92,7 @@ export function MQTTWrapper(props: any)
 
     let disconnect = () =>
     {
-        if(client) {
+        if(client && client.isConnected()) {
             client.disconnect();
             client = null;
         }
