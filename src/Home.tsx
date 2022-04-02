@@ -68,7 +68,7 @@ function StatusIndicatorCard() {
 }
 
 function ConnectButton() {
-    const [inputText, setInputText] = useState('ws://localhost:8082/');
+    const [inputText, setInputText] = useState('wss://mqtt.jpace121.net/');
     const mqtt = useContext(MQTTContext);
     const auth = useAuth();
 
