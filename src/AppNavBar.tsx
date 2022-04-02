@@ -43,7 +43,7 @@ export function AppNavBar() {
     return (
         <Navbar bg="light" variant="light" expand="sm" className="py-0">
             <Container>
-              <Navbar.Brand as={Link} to="/">J7S</Navbar.Brand>
+              <Navbar.Brand as={Link} to="/">j7s</Navbar.Brand>
               <Navbar.Toggle aria-controls="collapse-navbar-nav"/>
               <Navbar.Collapse id="collapse-navbar-nav">
               <Nav>
