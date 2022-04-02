@@ -29,7 +29,7 @@ export function getConfig() {
     let oidcConfig = {
         authority: "https://auth.jpace121.net/realms/jpace121-main",
         client_id: "jpace-mqtt",
-        redirect_uri: "http://localhost:3000/"
+        redirect_uri: "https://j7s-mqtt.jpace121.net/"
     };
 
     return oidcConfig;
