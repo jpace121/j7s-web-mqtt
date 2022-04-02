@@ -17,7 +17,7 @@ import {
 } from 'recoil';
 import {
   HashRouter,
-  Switch,
+  Routes,
   Route
 } from "react-router-dom";
 import { AuthProvider }  from "react-oidc-context";
@@ -33,20 +33,18 @@ import {
 import {
     Sub
 } from './Sub'
+import {
+    getConfig,
+    withAuth
+} from './AppAuth'
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
-const oidcConfig = {
-    authority: "https://auth.jpace121.net/realms/jpace121-main",
-    client_id: "jpace-mqtt",
-    redirect_uri: "http://localhost:3000/"
-};
-
 function App() {
   return (
       <RecoilRoot>
-          <AuthProvider {...oidcConfig}>
+          <AuthProvider {...getConfig()}>
             <MQTTWrapper>
                 <AppRoutes/>
             </MQTTWrapper>
@@ -56,13 +54,14 @@ function App() {
 }
 
 function AppRoutes() {
+
     return (
         <HashRouter>
-            <Switch>
-                <Route path="/pub"> <Pub/> </Route>
-                <Route path="/sub"> <Sub/> </Route>
-                <Route path="/"> <Home/> </Route>
-            </Switch>
+            <Routes>
+                <Route path="/pub" element={ withAuth(<Pub/>) } />
+                <Route path="/sub" element={ withAuth(<Sub/>) } />
+                <Route path="/" element={ withAuth(<Home/>) } />
+            </Routes>
         </HashRouter>
     );
 }

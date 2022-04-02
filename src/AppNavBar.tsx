@@ -22,7 +22,8 @@ import {
     useAuth,
 } from "react-oidc-context";
 import {
-  Link
+    Link,
+    useNavigate
 } from "react-router-dom";
 import {
     Navbar,
@@ -79,9 +80,12 @@ function Connected(props: any) {
 function Login(props: any) {
     const auth = useAuth();
     const mqtt = useContext(MQTTContext);
+    const navigate = useNavigate();
+
     let onLogout = () => {
         mqtt.disconnect();
         auth.removeUser();
+        navigate("/");
     };
 
 
