@@ -25,8 +25,8 @@ import {
   useRecoilValue,
 } from 'recoil';
 import {
-    subscribedBrightnessAtom,
-    subscribedColorAtom,
+    subscribedBrightnessAtomFamily,
+    subscribedColorAtomFamily,
     subscriptionIndexAtom
 } from './Atoms'
 import {
@@ -45,9 +45,10 @@ export function Sub() {
 }
 
 function SubscriptionCard() {
-    const brightnessState = useRecoilValue(subscribedBrightnessAtom);
-    const colorState = useRecoilValue(subscribedColorAtom);
     const [subscriptionIndexState, setSubscriptionIndex] = useRecoilState(subscriptionIndexAtom);
+
+    const brightnessState = useRecoilValue(subscribedBrightnessAtomFamily(parseInt(subscriptionIndexState)));
+    const colorState = useRecoilValue(subscribedColorAtomFamily(parseInt(subscriptionIndexState)));
 
     let onIndexChange = (event: any) =>
     {

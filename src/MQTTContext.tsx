@@ -14,15 +14,13 @@
 //
 import React, {createContext} from 'react';
 import {
-  useRecoilValue,
-  useSetRecoilState,
+  useSetRecoilState
 } from 'recoil';
 import {
     ConnectionState,
     connectionStatusAtom,
-    subscribedColorAtom,
-    subscribedBrightnessAtom,
-    subscriptionIndexAtom
+    subscribedColorAtomFamily,
+    subscribedBrightnessAtomFamily
 } from './Atoms'
 
 declare global {
@@ -40,11 +38,29 @@ export const MQTTContext = createContext(mqttDefault);
 export function MQTTWrapper(props: any)
 {
     const setConnectionStatus = useSetRecoilState(connectionStatusAtom);
-    const subscriptionIndex = useRecoilValue(subscriptionIndexAtom);
-    const setBrightness = useSetRecoilState(subscribedBrightnessAtom);
-    const setColor = useSetRecoilState(subscribedColorAtom);
+    // Having to build these arrays here is suboptimal.
+    const setBrightness = [
+        useSetRecoilState(subscribedBrightnessAtomFamily(0)),
+        useSetRecoilState(subscribedBrightnessAtomFamily(1)),
+        useSetRecoilState(subscribedBrightnessAtomFamily(2)),
+        useSetRecoilState(subscribedBrightnessAtomFamily(3)),
+        useSetRecoilState(subscribedBrightnessAtomFamily(4)),
+        useSetRecoilState(subscribedBrightnessAtomFamily(5)),
+        useSetRecoilState(subscribedBrightnessAtomFamily(6)),
+        useSetRecoilState(subscribedBrightnessAtomFamily(7))
+    ];
+    const setColor = [
+        useSetRecoilState(subscribedColorAtomFamily(0)),
+        useSetRecoilState(subscribedColorAtomFamily(1)),
+        useSetRecoilState(subscribedColorAtomFamily(2)),
+        useSetRecoilState(subscribedColorAtomFamily(3)),
+        useSetRecoilState(subscribedColorAtomFamily(4)),
+        useSetRecoilState(subscribedColorAtomFamily(5)),
+        useSetRecoilState(subscribedColorAtomFamily(6)),
+        useSetRecoilState(subscribedColorAtomFamily(7))
+    ];
 
-    let client: any = null; // eeww.
+    let client: any = null; // eeww
 
     let setLed = (index: number, color: string, brightness: number) => {
         if(!client) {
@@ -56,7 +72,7 @@ export function MQTTWrapper(props: any)
             color: color,
             brightness: brightness
         };
-        client.publish("led_state", JSON.stringify(payload));
+        client.publish("led_state", JSON.stringify(payload), 1, true);
         return true;
     }
 
@@ -74,10 +90,11 @@ export function MQTTWrapper(props: any)
         if(pahoMessage.destinationName === "led_state")
         {
             const payload = JSON.parse(pahoMessage.payloadString);
-            if(payload.index === parseInt(subscriptionIndex)) {
-                setBrightness(payload.brightness);
-                setColor(payload.color);
-            }
+
+            const index = payload.index;
+
+            setBrightness[index](payload.brightness);
+            setColor[index](payload.color);
         }
     }
 
@@ -111,4 +128,3 @@ export function MQTTWrapper(props: any)
         </MQTTContext.Provider>
     );
 }
-

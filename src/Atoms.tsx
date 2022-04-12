@@ -13,7 +13,8 @@
 // limitations under the License.
 //
 import {
-  atom
+    atom,
+    atomFamily
 } from 'recoil';
 
 export enum ConnectionState {
@@ -28,21 +29,22 @@ export const connectionStatusAtom = atom(
         default: ConnectionState.False,
     });
 
-export const subscribedColorAtom = atom(
-    {
-        key: 'subscribedColorAtom',
-        default: 'None'
-    });
-
-export const subscribedBrightnessAtom = atom(
-    {
-        key: 'subscribedBrightnessAtom',
-        default: 'None'
-    });
-
 export const subscriptionIndexAtom = atom(
     {
         key: 'subscriptionIndexAtom',
         default: '0'
     });
+
+export const subscribedColorAtomFamily = atomFamily(
+    {
+        key: 'subscribedColorAtom',
+        default: 'None'
+    });
+
+export const subscribedBrightnessAtomFamily = atomFamily(
+    {
+        key: 'subscribedBrightnessAtom',
+        default: 'None'
+    });
+
 
