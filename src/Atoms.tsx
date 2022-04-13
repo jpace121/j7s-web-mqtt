@@ -29,12 +29,6 @@ export const connectionStatusAtom = atom(
         default: ConnectionState.False,
     });
 
-export const subscriptionIndexAtom = atom(
-    {
-        key: 'subscriptionIndexAtom',
-        default: '0'
-    });
-
 export const subscribedColorAtomFamily = atomFamily(
     {
         key: 'subscribedColorAtom',

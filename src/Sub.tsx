@@ -21,13 +21,14 @@ import {
     FloatingLabel
 } from 'react-bootstrap';
 import {
-  useRecoilState,
-  useRecoilValue,
+    useState
+} from 'react';
+import {
+  useRecoilValue
 } from 'recoil';
 import {
     subscribedBrightnessAtomFamily,
-    subscribedColorAtomFamily,
-    subscriptionIndexAtom
+    subscribedColorAtomFamily
 } from './Atoms'
 import {
     AppNavBar
@@ -45,7 +46,7 @@ export function Sub() {
 }
 
 function SubscriptionCard() {
-    const [subscriptionIndexState, setSubscriptionIndex] = useRecoilState(subscriptionIndexAtom);
+    const [subscriptionIndexState, setSubscriptionIndex] = useState("0");
 
     const brightnessState = useRecoilValue(subscribedBrightnessAtomFamily(parseInt(subscriptionIndexState)));
     const colorState = useRecoilValue(subscribedColorAtomFamily(parseInt(subscriptionIndexState)));
