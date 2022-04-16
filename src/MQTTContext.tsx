@@ -67,18 +67,18 @@ export function MQTTWrapper(props: any)
             return false;
         }
 
+        const topic_name = `/led_state/${index}`;
         let payload = {
-            index: index,
             color: color,
             brightness: brightness
         };
-        client.publish("led_state", JSON.stringify(payload), 1, true);
+        client.publish(topic_name, JSON.stringify(payload), 1, true);
         return true;
     }
 
     let onConnected = (context : any) => {
         setConnectionStatus(ConnectionState.True);
-        client.subscribe("led_state")
+        client.subscribe("/led_state/+")
     }
     let onConnectionLost = (context : any) => {
         setConnectionStatus(ConnectionState.False);
@@ -87,15 +87,29 @@ export function MQTTWrapper(props: any)
         setConnectionStatus(ConnectionState.Errored);
     }
     let onMessageArrived = (pahoMessage : any) => {
-        if(pahoMessage.destinationName === "led_state")
+        const topic = pahoMessage.destinationName;
+        const topicLevels = topic.split('/').filter( (element : any) => element);
+
+        if(topicLevels.length !== 2)
         {
-            const payload = JSON.parse(pahoMessage.payloadString);
-
-            const index = payload.index;
-
-            setBrightness[index](payload.brightness);
-            setColor[index](payload.color);
+            // This is not in the format I was expecting.
+            console.log(`Not enough elements in topic name. ${topicLevels}`);
+            return;
         }
+        if(topicLevels[0] !== "led_state")
+        {
+            // Not the right topic.
+            console.log("Not the right highest topic level.");
+            return;
+        }
+
+        const payload = JSON.parse(pahoMessage.payloadString);
+
+        const index = parseInt(topicLevels[1]);
+        console.log(`Index: ${index}`);
+
+        setBrightness[index](payload.brightness);
+        setColor[index](payload.color);
     }
 
     let connect = (ipAddress: string, username: string, password: string) =>
